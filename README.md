@@ -1,1 +1,0 @@
-# vigilant_complete_numbers
