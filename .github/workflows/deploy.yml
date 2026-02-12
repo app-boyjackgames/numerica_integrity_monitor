@@ -24,10 +24,6 @@ jobs:
       - run: |
           pip install -r requirements.txt
 
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: build/
-
   deploy:
     needs: build
     runs-on: ubuntu-latest
