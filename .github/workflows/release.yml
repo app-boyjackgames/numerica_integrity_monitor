@@ -2,83 +2,94 @@ name: Build and Release
 
 on:
   push:
-    branches:
-      - main
     tags:
       - 'v*'
 
 jobs:
-  build-linux:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      - name: Install PyInstaller
-        run: pip install pyinstaller flask
-      - name: Build Executable
-        run: pyinstaller --onefile main.py
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: linux-binary
-          path: dist/main
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact_name: Numerica-linux
+            bundle_name: Numerica-linux
+            executable: main
+            archive_cmd: tar -czf
+            archive_ext: tar.gz
 
-  build-windows:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      - name: Install PyInstaller
-        run: pip install pyinstaller flask
-      - name: Build Executable
-        run: pyinstaller --onefile main.py
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: windows-binary
-          path: dist/main.exe
+          - os: windows-latest
+            artifact_name: Numerica-windows
+            bundle_name: Numerica-windows
+            executable: main.exe
+            archive_cmd: powershell Compress-Archive -Path
+            archive_ext: zip
 
-  build-macos:
-    runs-on: macos-latest
+          - os: macos-latest
+            artifact_name: Numerica-macos
+            bundle_name: Numerica-macos
+            executable: main
+            archive_cmd: tar -czf
+            archive_ext: tar.gz
+
+    runs-on: ${{ matrix.os }}
+
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
+
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Install PyInstaller
-        run: pip install pyinstaller flask
-      - name: Build Executable
-        run: pyinstaller --onefile main.py
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
+
+      - run: pip install pyinstaller flask
+
+      - run: pyinstaller --onefile main.py
+
+      # Create bundle
+      - name: Create bundle (Linux/macOS)
+        if: runner.os != 'Windows'
+        run: |
+          VERSION=${{ github.ref_name }}
+          mkdir bundle
+          cp dist/${{ matrix.executable }} bundle/
+          cp README.md bundle/ || true
+          tar -czf ${{ matrix.bundle_name }}-$VERSION.${{ matrix.archive_ext }} bundle
+
+      - name: Create bundle (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          $VERSION="${{ github.ref_name }}"
+          mkdir bundle
+          copy dist\${{ matrix.executable }} bundle\
+          Compress-Archive -Path bundle\* -DestinationPath ${{ matrix.bundle_name }}-$VERSION.zip
+
+      - uses: actions/upload-artifact@v4
         with:
-          name: macos-binary
-          path: dist/main
+          name: ${{ matrix.bundle_name }}
+          path: ${{ matrix.bundle_name }}-${{ github.ref_name }}.${{ matrix.archive_ext }}
 
   create-release:
-    needs: [build-linux, build-windows, build-macos]
+    needs: build
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/download-artifact@v4
 
-      - name: Create Release
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ github.ref_name }}
           name: Changelog ${{ github.ref_name }}
           body: |
-            ### Numerica Integrity Monitor ${{ github.ref_name }}
-          fail_on_unmatched_files: true
-          prerelease: false
-          draft: false
+            ## Numerica Integrity Monitor ${{ github.ref_name }}
+
+            ### Изменения
+            - Исправление ошибок
+            - Добавить
+            - Изменить
+            - Удалена
           files: |
-            linux-binary/main
-            windows-binary/main.exe
-            macos-binary/main
+            Numerica-linux/*
+            Numerica-windows/*
+            Numerica-macos/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
