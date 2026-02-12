@@ -4,9 +4,6 @@ on:
   schedule:
     # каждые 5 минут (пример из диапазона 2-59 минут)
     - cron: "*/5 * * * *"
-    # каждый 3 час (пример из диапазона 1-6 часов)
-    - cron: "0 */3 * * *"
-  workflow_dispatch:
 
 permissions:
   issues: write
