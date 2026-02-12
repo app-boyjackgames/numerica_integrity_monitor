@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Explorer | Numerical Integrity</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body class="cyber-theme">
+    <div class="container">
+        <header>
+            <h1 class="glitch" data-text="NUMERICAL INTEGRITY MONITOR">NUMERICAL INTEGRITY MONITOR</h1>
+            <p class="status-line"><span class="blink">●</span> SYSTEM STATUS: VIGILANT</p>
+        </header>
+
+        <main>
+            <section class="scanner-section">
+                <div class="input-group">
+                    <label for="number-input">INPUT_TARGET_NUMBER:</label>
+                    <input type="number" id="number-input" placeholder="Enter integer..." min="1">
+                    <button id="analyze-btn" class="cyber-btn">ANALYZE_CORE</button>
+                </div>
+            </section>
+
+            <section id="result-display" class="hidden">
+                <div class="result-card">
+                    <div class="card-header">
+                        <h2>ANALYSIS_REPORT: <span id="res-number"></span></h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="property-badges" id="res-badges"></div>
+                        <div class="stats">
+                            <p>DIVISOR_SUM: <span id="res-sum"></span></p>
+                            <p>DIVISORS: <span id="res-divisors"></span></p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="history-section">
+                <h3>RECENT_SCANS</h3>
+                <ul id="scan-history"></ul>
+            </section>
+        </main>
+    </div>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
