@@ -2,6 +2,8 @@ name: Build and Release
 
 on:
   push:
+    branches:
+      - main
     tags:
       - 'v*'
 
@@ -22,7 +24,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: linux-binary
-          path: dist/main
+          path: dist/numerica_integrity_monitor
 
   build-windows:
     runs-on: windows-latest
@@ -40,7 +42,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: windows-binary
-          path: dist/main.exe
+          path: dist/numerica_integrity_monitor.exe
 
   build-macos:
     runs-on: macos-latest
@@ -58,7 +60,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: macos-binary
-          path: dist/main
+          path: dist/numerica_integrity_monitor
 
   create-release:
     needs: [build-linux, build-windows, build-macos]
@@ -70,8 +72,6 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            linux-binary/main
-            windows-binary/main.exe
-            macos-binary/main
-        env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+            linux-binary/numerica_integrity_monitor
+            windows-binary/numerica_integrity_monitor.exe
+            macos-binary/numerica_integrity_monitor
