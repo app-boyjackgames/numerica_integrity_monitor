@@ -5,7 +5,7 @@ on:
     branches:
       - main
     tags:
-      - 'v1.0.0'
+      - 'v*'
 
 jobs:
   build-linux:
@@ -66,11 +66,15 @@ jobs:
     needs: [build-linux, build-windows, build-macos]
     runs-on: ubuntu-latest
     steps:
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
+
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
+          tag_name: ${{ github.ref_name }}
+          name: Changelog ${{ github.ref_name }}
+          body: |
+            ### Numerica Integrity Monitor ${{ github.ref_name }}
           files: |
             linux-binary/main
             windows-binary/main.exe
