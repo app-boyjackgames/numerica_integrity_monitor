@@ -1,9 +1,12 @@
 name: Issue Moderation Bot
 
 on:
+  workflow_dispatch:
   schedule:
     # каждые 5 минут (пример из диапазона 2-59 минут)
     - cron: "*/5 * * * *"
+    branches:
+      - main
 
 permissions:
   issues: write
