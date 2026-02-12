@@ -75,6 +75,9 @@ jobs:
           name: Changelog ${{ github.ref_name }}
           body: |
             ### Numerica Integrity Monitor ${{ github.ref_name }}
+          fail_on_unmatched_files: true
+          prerelease: false
+          draft: false
           files: |
             linux-binary/main
             windows-binary/main.exe
